@@ -1,0 +1,35 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+
+# Go
+backend/worktrack
+backend/*.exe
+backend/*.test
+backend/tmp/
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Docker
+.docker/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
