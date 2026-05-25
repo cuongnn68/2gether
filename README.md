@@ -1,5 +1,7 @@
 # WorkTrack
 
+[![Build and Push Docker Images](https://github.com/cuongnn68/worktrack/actions/workflows/docker.yml/badge.svg)](https://github.com/cuongnn68/worktrack/actions/workflows/docker.yml)
+
 Track your team's daily tasks with points and leaderboards.
 
 ## Features
@@ -47,12 +49,35 @@ Edit `.env` and fill in:
 GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-client-secret
 JWT_SECRET=a-long-random-secret-string
+
+# Optional — defaults work for local Docker
+GOOGLE_REDIRECT_URL=http://localhost/api/auth/google/callback
+FRONTEND_URL=http://localhost
 ```
 
 ### 3. Run
 
+**Option A — build from source** (`docker-compose.yml`):
+
 ```bash
 docker compose up --build
+```
+
+**Option B — use prebuilt images from GHCR** (`docker-compose.prod.yml`):
+
+Add to your `.env`:
+
+```env
+GITHUB_REPOSITORY_OWNER=cuongnn68
+TAG=latest  # optional, defaults to latest
+GOOGLE_REDIRECT_URL=http://localhost/api/auth/google/callback
+FRONTEND_URL=http://localhost
+```
+
+Then run:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 Open **http://localhost** in your browser.
@@ -172,19 +197,22 @@ After creating a group, go to the **Admin** tab to:
 ```
 worktrack/
 ├── docker-compose.yml
+├── docker-compose.prod.yml
 ├── .env.example
 ├── backend/
 │   ├── Dockerfile
 │   ├── go.mod
 │   ├── main.go
-│   ├── db/db.go           # SQLite layer + all models
-│   ├── middleware/auth.go  # JWT validation
+│   ├── db/db.go               # SQLite layer + all models
+│   ├── middleware/
+│   │   ├── auth.go            # JWT validation
+│   │   └── ratelimit.go       # Rate limiting
 │   └── handlers/
-│       ├── auth.go         # Google OAuth2
-│       ├── groups.go       # Group CRUD
-│       ├── tasks.go        # Task type CRUD
-│       ├── logs.go         # Task logs + leaderboard
-│       └── helpers.go      # Shared utilities
+│       ├── auth.go            # Google OAuth2
+│       ├── groups.go          # Group CRUD
+│       ├── tasks.go           # Task type CRUD
+│       ├── logs.go            # Task logs + leaderboard
+│       └── helpers.go         # Shared utilities
 └── frontend/
     ├── Dockerfile
     ├── nginx.conf
