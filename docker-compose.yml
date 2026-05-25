@@ -24,7 +24,7 @@ services:
     container_name: 2gether-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "3002:80"
     depends_on:
       - backend
     networks:

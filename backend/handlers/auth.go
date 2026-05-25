@@ -50,51 +50,59 @@ func NewAuthHandler(database *db.DB) *AuthHandler {
 	}
 }
 
+// generateOAuthState creates a short-lived signed JWT to use as the OAuth state
+// parameter. No browser storage is needed — the backend validates the signature
+// on callback, which works around Safari ITP blocking cookies set during
+// redirect flows.
+func (h *AuthHandler) generateOAuthState() (string, error) {
+	nonceBytes := make([]byte, 16)
+	if _, err := rand.Read(nonceBytes); err != nil {
+		return "", err
+	}
+	claims := jwt.MapClaims{
+		"nonce": base64.URLEncoding.EncodeToString(nonceBytes),
+		"pur":   "oauth_state",
+		"exp":   time.Now().Add(5 * time.Minute).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(h.secret))
+}
+
+func (h *AuthHandler) validateOAuthState(state string) bool {
+	token, err := jwt.Parse(state, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+		return []byte(h.secret), nil
+	})
+	if err != nil || !token.Valid {
+		return false
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return false
+	}
+	pur, _ := claims["pur"].(string)
+	return pur == "oauth_state"
+}
+
 // GoogleLogin initiates the Google OAuth2 flow.
 func (h *AuthHandler) GoogleLogin(w http.ResponseWriter, r *http.Request) {
-	// Generate random state value.
-	stateBytes := make([]byte, 16)
-	if _, err := rand.Read(stateBytes); err != nil {
+	state, err := h.generateOAuthState()
+	if err != nil {
 		jsonError(w, "failed to generate state", http.StatusInternalServerError)
 		return
 	}
-	state := base64.URLEncoding.EncodeToString(stateBytes)
-
-	// Store state in an HttpOnly cookie (valid for 5 minutes).
-	http.SetCookie(w, &http.Cookie{
-		Name:     "oauth_state",
-		Value:    state,
-		Path:     "/",
-		HttpOnly: true,
-		MaxAge:   300,
-		SameSite: http.SameSiteLaxMode,
-	})
-
 	url := h.oauth.AuthCodeURL(state, oauth2.AccessTypeOnline)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 // GoogleCallback handles the OAuth2 redirect from Google.
 func (h *AuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
-	// Validate state cookie.
-	cookie, err := r.Cookie("oauth_state")
-	if err != nil {
-		jsonError(w, "missing state cookie", http.StatusBadRequest)
+	if !h.validateOAuthState(r.URL.Query().Get("state")) {
+		jsonError(w, "invalid state", http.StatusBadRequest)
 		return
 	}
-	if r.URL.Query().Get("state") != cookie.Value {
-		jsonError(w, "state mismatch", http.StatusBadRequest)
-		return
-	}
-
-	// Clear the state cookie.
-	http.SetCookie(w, &http.Cookie{
-		Name:     "oauth_state",
-		Value:    "",
-		Path:     "/",
-		HttpOnly: true,
-		MaxAge:   -1,
-	})
 
 	// Exchange code for token.
 	code := r.URL.Query().Get("code")
