@@ -12,18 +12,21 @@ type contextKey string
 
 const userIDKey contextKey = "userID"
 
-// Authenticate returns a middleware that validates JWT bearer tokens.
-// The user ID extracted from the "sub" claim is stored in the request context.
+// Authenticate returns a middleware that validates JWT tokens from either the
+// "jwt" HttpOnly cookie (production) or an Authorization Bearer header (dev).
 func Authenticate(secret string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			authHeader := r.Header.Get("Authorization")
-			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-				http.Error(w, `{"error":"missing or invalid authorization header"}`, http.StatusUnauthorized)
+			var tokenStr string
+			if cookie, err := r.Cookie("jwt"); err == nil {
+				tokenStr = cookie.Value
+			} else if h := r.Header.Get("Authorization"); strings.HasPrefix(h, "Bearer ") {
+				tokenStr = strings.TrimPrefix(h, "Bearer ")
+			}
+			if tokenStr == "" {
+				http.Error(w, `{"error":"unauthorized"}`, http.StatusUnauthorized)
 				return
 			}
-
-			tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
 			token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {

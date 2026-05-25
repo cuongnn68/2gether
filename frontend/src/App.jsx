@@ -1,22 +1,8 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
-
-function TokenHandler() {
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const token = params.get('token')
-    if (token) {
-      localStorage.setItem('token', token)
-      window.history.replaceState({}, '', '/')
-      window.location.reload()
-    }
-  }, [])
-
-  return null
-}
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -35,7 +21,6 @@ function PublicRoute({ children }) {
 function AppRoutes() {
   return (
     <>
-      <TokenHandler />
       <Routes>
         <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />

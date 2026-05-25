@@ -5,8 +5,8 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"2gether/db"
@@ -157,7 +157,31 @@ func (h *AuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s?token=%s", h.frontendURL, signed), http.StatusTemporaryRedirect)
+	// Set HttpOnly cookie — avoids all Safari ITP / localStorage / URL-param issues.
+	http.SetCookie(w, &http.Cookie{
+		Name:     "jwt",
+		Value:    signed,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   strings.HasPrefix(h.frontendURL, "https://"),
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   30 * 24 * 60 * 60,
+	})
+	http.Redirect(w, r, h.frontendURL, http.StatusTemporaryRedirect)
+}
+
+// Logout clears the jwt cookie.
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   strings.HasPrefix(h.frontendURL, "https://"),
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
+	})
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // Me returns the currently authenticated user.

@@ -50,6 +50,7 @@ func main() {
 	r.Route("/api/auth", func(r chi.Router) {
 		r.Get("/google/login", authHandler.GoogleLogin)
 		r.Get("/google/callback", authHandler.GoogleCallback)
+		r.Post("/google/logout", authHandler.Logout)
 	})
 
 	// Protected routes.

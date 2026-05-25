@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { getGoogleLoginURL, getMe } from '../api'
+import { getGoogleLoginURL, getMe, logoutAPI } from '../api'
 
 const AuthContext = createContext(null)
 
@@ -8,14 +8,9 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      setLoading(false)
-      return
-    }
     getMe()
       .then((res) => setUser(res.data))
-      .catch(() => localStorage.removeItem('token'))
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
@@ -24,8 +19,9 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
-    setUser(null)
+    logoutAPI().finally(() => {
+      setUser(null)
+    })
   }
 
   return (

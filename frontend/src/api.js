@@ -3,16 +3,11 @@ import axios from 'axios'
 // Use ?? so empty string (Docker/nginx proxy) is preserved; fall back only when truly unset
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
 
-export const api = axios.create({ baseURL: API_URL })
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+export const api = axios.create({ baseURL: API_URL, withCredentials: true })
 
 export const getGoogleLoginURL = () => `${API_URL}/api/auth/google/login`
 export const getMe = () => api.get('/api/auth/me')
+export const logoutAPI = () => api.post('/api/auth/google/logout')
 
 export const getMyGroups = () => api.get('/api/groups')
 export const createGroup = (data) => api.post('/api/groups', data)
