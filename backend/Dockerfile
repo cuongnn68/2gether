@@ -3,11 +3,11 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -o worktrack .
+RUN go build -o 2gether .
 
 FROM alpine:3.19
 RUN apk add --no-cache ca-certificates
 WORKDIR /app
-COPY --from=builder /app/worktrack .
+COPY --from=builder /app/2gether .
 EXPOSE 8080
-CMD ["./worktrack"]
+CMD ["./2gether"]

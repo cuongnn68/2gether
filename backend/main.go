@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"worktrack/db"
-	"worktrack/handlers"
-	wkmiddleware "worktrack/middleware"
+	"2gether/db"
+	"2gether/handlers"
+	wkmiddleware "2gether/middleware"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -17,7 +17,7 @@ import (
 
 func main() {
 	port := getenv("PORT", "8080")
-	dbPath := getenv("DB_PATH", "/data/worktrack.db")
+	dbPath := getenv("DB_PATH", "/data/2gether.db")
 	frontendURL := getenv("FRONTEND_URL", "http://localhost:5173")
 	jwtSecret := getenv("JWT_SECRET", "change-me-in-production")
 
@@ -85,7 +85,7 @@ func main() {
 	})
 
 	addr := ":" + port
-	log.Printf("worktrack server listening on %s", addr)
+	log.Printf("2gether server listening on %s", addr)
 	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("server error: %v", err)
 	}

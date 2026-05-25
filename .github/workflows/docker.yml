@@ -37,7 +37,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/worktrack-backend
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/2gether-backend
           tags: |
             type=ref,event=branch
             type=sha,prefix=sha-
@@ -81,7 +81,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/worktrack-frontend
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/2gether-frontend
           tags: |
             type=ref,event=branch
             type=sha,prefix=sha-

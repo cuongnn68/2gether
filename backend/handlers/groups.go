@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"worktrack/db"
-	"worktrack/middleware"
+	"2gether/db"
+	"2gether/middleware"
 
 	"github.com/go-chi/chi/v5"
 )

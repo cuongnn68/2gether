@@ -1,4 +1,4 @@
-module worktrack
+module 2gether
 
 go 1.21
 

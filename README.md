@@ -1,6 +1,6 @@
 # WorkTrack
 
-[![Build and Push Docker Images](https://github.com/cuongnn68/worktrack/actions/workflows/docker.yml/badge.svg)](https://github.com/cuongnn68/worktrack/actions/workflows/docker.yml)
+[![Build and Push Docker Images](https://github.com/cuongnn68/2gether/actions/workflows/docker.yml/badge.svg)](https://github.com/cuongnn68/2gether/actions/workflows/docker.yml)
 
 Track your team's daily tasks with points and leaderboards.
 
@@ -97,7 +97,7 @@ export GOOGLE_CLIENT_SECRET=your-secret
 export GOOGLE_REDIRECT_URL=http://localhost:8080/api/auth/google/callback
 export FRONTEND_URL=http://localhost:5173
 export JWT_SECRET=dev-secret
-export DB_PATH=./worktrack.db
+export DB_PATH=./2gether.db
 go run .
 ```
 
@@ -131,7 +131,7 @@ npm run dev
 | `GOOGLE_REDIRECT_URL` | `http://localhost/api/auth/google/callback` | OAuth2 callback URL |
 | `FRONTEND_URL` | `http://localhost` | Frontend URL (backend redirects here after login) |
 | `PORT` | `8080` | Backend server port |
-| `DB_PATH` | `/data/worktrack.db` | SQLite database file path |
+| `DB_PATH` | `/data/2gether.db` | SQLite database file path |
 
 ---
 
@@ -147,7 +147,7 @@ npm run dev
                                         │
                               ┌─────────────────────┐
                               │   Docker Volume      │
-                              │   /data/worktrack.db │
+                              │   /data/2gether.db │
                               └─────────────────────┘
 ```
 
@@ -195,7 +195,7 @@ After creating a group, go to the **Admin** tab to:
 ## Project Structure
 
 ```
-worktrack/
+2gether/
 ├── docker-compose.yml
 ├── docker-compose.prod.yml
 ├── .env.example

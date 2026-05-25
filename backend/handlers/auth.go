@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	"worktrack/db"
-	wkmiddleware "worktrack/middleware"
+	"2gether/db"
+	wkmiddleware "2gether/middleware"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/oauth2"

@@ -25,7 +25,7 @@ type User struct {
 	CreatedAt string `json:"created_at"`
 }
 
-// Group represents a worktrack group.
+// Group represents a 2gether group.
 type Group struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`

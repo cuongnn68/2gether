@@ -33,3 +33,4 @@ frontend/.vite/
 .idea/
 *.swp
 *.swo
+.aider*
